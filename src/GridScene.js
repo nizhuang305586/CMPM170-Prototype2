@@ -28,11 +28,6 @@ class GridScene extends Phaser.Scene {
                 graphics.fillRect(
                     x, y, tileSize, tileSize
                 );
-
-                graphics.lineStyle(1, 0x554f43, 1);
-                graphics.strokeRect(
-                    x, y, tileSize, tileSize
-                );
             }
         }
 
