@@ -7,4 +7,15 @@ TO DO:
 
 
 
+Prefabs
+    Players
+
+Scenes
+    GridScene
+
+
+Round System
+
+
+
 --State Machine, Round State and Movement State
