@@ -15,6 +15,13 @@ Scenes
 
 
 Round System
+    2d array? 3d? 
+        x: num
+        y: num
+        players/statue: boolean
+
+        player x movement, player y movement, player type 
+        xy = playe
 
 
 

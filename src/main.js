@@ -8,7 +8,7 @@ const config = {
         mode: Phaser.Scale.FIT,
         autoCenter: Phaser.Scale.CENTER_BOTH
     },
-    scene: [GridScene]
+    scene: [Load, PlayerCount, RoundSystem]
 };
 
 const game = new Phaser.Game(config);

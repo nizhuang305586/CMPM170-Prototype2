@@ -1,6 +1,6 @@
-class GridScene extends Phaser.Scene {
+class Load extends Phaser.Scene {
     constructor() {
-        super("GridScene");
+        super("Load")
     }
 
     create() {
@@ -31,14 +31,6 @@ class GridScene extends Phaser.Scene {
             }
         }
 
-        // Temporary player token.
-        this.add.circle(
-            offsetX + tileSize / 2,
-            offsetY + tileSize / 2,
-            tileSize * 0.32,
-            0x3399ff
-        );
-
         this.add.text(
             20, 20,
             "Museum Heist - Grid Prototype",
@@ -47,5 +39,8 @@ class GridScene extends Phaser.Scene {
                 color: "#ffffff"
             }
         );
+
+
+        this.scene.launch("PlayerCount")
     }
 }
