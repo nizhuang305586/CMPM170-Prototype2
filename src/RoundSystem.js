@@ -68,8 +68,14 @@ class RoundSystem extends Phaser.Scene {
 
         const colors = [0x3399ff, 0xff6666]
 
+        const startingPositions = [
+            { col: 0, row: 0 },    // Player 1 starting position
+            { col: 15, row: 15 }   // Player 2 starting position
+        ];
+
         for (let i = 0; i < this.playerCount; i++) {
-            this.players[i] = new Player(this, i, 0, colors[i], i + 1);
+            const start = startingPositions[i];
+            this.players[i] = new Player(this, start.col, start.row, colors[i], i + 1);
         }
 
         this.rounds = this.players.length - 1;
