@@ -44,7 +44,7 @@ class PlayerCount extends Phaser.Scene {
     }
 
     startGame(playerCount) {
-        this.scene.launch("RoundSystem", {PlayerCount: playerCount})
+        this.scene.start("RoundSystem", {PlayerCount: playerCount})
     }
 }
 
