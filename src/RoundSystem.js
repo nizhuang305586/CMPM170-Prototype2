@@ -6,6 +6,7 @@ class RoundSystem extends Phaser.Scene {
         this.rounds = null;
         this.movesRemaining = null;
         this.currentPlayerIndex = 0;
+        this.hasTreasure = false;
     }
 
     init(data) {
@@ -22,6 +23,14 @@ class RoundSystem extends Phaser.Scene {
             backgroundColor: "#222222",
             padding: { x: 8, y: 5 }
         })
+
+        this.treasureHolder = this.add.text(775, 300, "Treasure: Nobody", 
+            {
+                fontSize: "16px",
+                color: "#ffffff",
+                backgroundColor: "#222222",
+                padding: { x: 8, y: 8 }
+            });
 
         this.coinResult = this.add.text(795, 400, "", {
             fontSize: "14px",
@@ -133,6 +142,17 @@ class RoundSystem extends Phaser.Scene {
             }
         }
 
+        this.treasure = {
+            col: 8, 
+            row: 8,
+            icon: this.add.text(
+                offsetX + boardSize / 2 + 1.5,
+                offsetY + boardSize / 2 + 5,
+                "💎",
+                { fontSize: "32px" }
+            )
+        };
+
         this.add.text(
             20, 20,
             "Museum Heist - Grid Prototype",
@@ -161,10 +181,29 @@ class RoundSystem extends Phaser.Scene {
         player.col = newCol;
         player.row = newRow;
 
+        if(player.col == this.treasure.col && player.row === this.treasure.row){
+            player.hasTreasure = true;
+            this.treasure.icon.setVisible(false);
+            this.treasureHolder.setText(
+                `Treasure: Player ${this.currentPlayerIndex + 1}`
+            );
+        }
+
         player.setPosition(
             offsetX + newCol * tileSize + tileSize / 2,
-            offsetY + newRow * tileSize + tileSize / 2
+            offsetY + newRow * tileSize + tileSize / 2,
         );
+
+        for (const op of this.players) {
+            if( op != player && op.hasTreasure && op.row == player.row && op.col == player.col)
+            {
+                op.hasTreasure = false;
+                player.hasTreasure = true;
+                this.treasureHolder.setText(
+                    `Treasure: Player ${this.currentPlayerIndex + 1}`
+                );
+            }
+        }    
 
         this.movesRemaining--;
         this.rollNumber.setText(`Moves: ${this.movesRemaining}`);
