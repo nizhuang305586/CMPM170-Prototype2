@@ -9,6 +9,7 @@ class RoundSystem extends Phaser.Scene {
         this.hasTreasure = false;
         this.selectedPiece = null;
         this.turnHasMoved = false;
+        this.statues = [];
     }
 
     init(data) {
@@ -101,6 +102,8 @@ class RoundSystem extends Phaser.Scene {
         }
 
         this.selectedPiece = this.players[this.currentPlayerIndex];
+
+        this.createStatues();
 
         this.rounds = this.players.length - 1;
 
@@ -299,6 +302,14 @@ class RoundSystem extends Phaser.Scene {
 
     StatuesMove() {
         console.log("Statues moving");
+
+        for (const statue of this.statues) {
+            let randomInt = Phaser.Math.Between(1, 4); 
+            statue.direction = (statue.direction + randomInt) % 4;
+
+            this.drawStatueFOV(statue);
+        }
+
     }
 
     makeButton(x, y, label, onClick) {
@@ -409,6 +420,76 @@ class RoundSystem extends Phaser.Scene {
         this.nextTurn();
     }
 
-    
+
+    createStatues() {
+        const positions = [
+            { col: 4, row: 4, direction: 1 },
+            { col: 11, row: 3, direction: 2 },
+            { col: 10, row: 11, direction: 3 }
+        ];
+
+        for (const position of positions) {
+            const statue = {
+                col: position.col,
+                row: position.row,
+                direction: position.direction,
+                range: 5,
+                fovGraphics: this.add.graphics(),
+                icon: this.add.text(0, 0, "😭", {
+                    fontSize: "26px",
+                }).setOrigin(0.5).setDepth(4)
+            };
+
+            this.statues.push(statue);
+            this.drawStatueFOV(statue);
+        }
+    }
+
+    drawStatueFOV(statue) {
+        const tileSize = this.registry.get("tileSize");
+        const offsetX = this.registry.get("offsetX");
+        const offsetY = this.registry.get("offsetY");
+        const gridSize = this.registry.get("gridSize");
+
+        const directions = [
+            { col: 0, row: -1 }, // Up
+            { col: 1, row: 0 },  // Right
+            { col: 0, row: 1 },  // Down
+            { col: -1, row: 0 }  // Left
+        ];
+
+        const direction = directions[statue.direction];
+
+        statue.fovGraphics.clear();
+        statue.fovGraphics.setDepth(2);
+
+        // Make visible
+        statue.fovGraphics.fillStyle(0xff2222, 0.3);
+
+        for (let distance = 1; distance <= statue.range; distance++) {
+            const col = statue.col + direction.col * distance;
+            const row = statue.row + direction.row * distance;
+
+            if (
+                col < 0 || col >= gridSize ||
+                row < 0 || row >= gridSize
+            ) {
+                break;
+            }
+
+            statue.fovGraphics.fillRect(
+                offsetX + col * tileSize,
+                offsetY + row * tileSize,
+                tileSize,
+                tileSize
+            );
+        }
+
+        statue.icon.setPosition(
+            offsetX + statue.col * tileSize + tileSize / 2,
+            offsetY + statue.row * tileSize + tileSize / 2
+        );
+    }
+
 }
 
