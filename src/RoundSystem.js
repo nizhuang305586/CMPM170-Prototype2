@@ -23,6 +23,20 @@ class RoundSystem extends Phaser.Scene {
             padding: { x: 8, y: 5 }
         })
 
+        this.coinResult = this.add.text(795, 400, "", {
+            fontSize: "14px",
+            color: "#050505",
+            backgroundColor: "#fdfdfd",
+            padding: { x: 8, y: 8 }
+        })
+
+        this.makeButton(840, 450, "Flip Coin", () =>{
+            const result = Phaser.Math.Between(0, 1) === 0
+                ? "Heads"
+                : "Tails";
+            this.coinResult.setText(result);
+        });
+
         this.rollNumber = this.add.text(795, 500, "", {
             fontSize: "14px",
             color: "#050505",
