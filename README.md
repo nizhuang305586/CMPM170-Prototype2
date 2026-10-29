@@ -26,3 +26,10 @@ Round System
 
 
 --State Machine, Round State and Movement State
+
+IDEAS:
+
+Cloning
+    Clones pull statues attention
+    If in line of sight can bounce a clone out to survive
+    
