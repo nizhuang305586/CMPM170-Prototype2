@@ -197,7 +197,7 @@ class RoundSystem extends Phaser.Scene {
 
         this.add.text(
             20, 20,
-            "Museum Heist - Grid Prototype",
+            "Museum Heist - Prototype",
             {
                 fontSize: "20px",
                 color: "#ffffff"
