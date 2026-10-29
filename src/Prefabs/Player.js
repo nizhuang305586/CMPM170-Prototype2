@@ -11,6 +11,8 @@ class Player extends Phaser.GameObjects.Arc {
 
         scene.add.existing(this);
 
+        this.setDepth(5);
+
         this.id = id;
         this.col = col;
         this.row = row;

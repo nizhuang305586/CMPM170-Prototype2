@@ -372,7 +372,7 @@ class RoundSystem extends Phaser.Scene {
             const col = player.col + direction.col;
             const row = player.row + direction.row;
 
-            // Avoid outside spawning
+            // Avoid outside spawns
             if (
                 col < 0 || col >= gridSize ||
                 row < 0 || row >= gridSize
@@ -416,7 +416,7 @@ class RoundSystem extends Phaser.Scene {
         player.hasCloned = true;
         clone.cloneJustCreated = true;
 
-        // Cloning ends the player's turn.
+        // Clone ends turn
         this.nextTurn();
     }
 
@@ -463,7 +463,7 @@ class RoundSystem extends Phaser.Scene {
         statue.fovGraphics.clear();
         statue.fovGraphics.setDepth(2);
 
-        // Make visible
+        // Make FOV visible
         statue.fovGraphics.fillStyle(0xff2222, 0.3);
 
         for (let distance = 1; distance <= statue.range; distance++) {
