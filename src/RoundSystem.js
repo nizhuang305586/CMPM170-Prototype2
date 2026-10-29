@@ -7,6 +7,8 @@ class RoundSystem extends Phaser.Scene {
         this.movesRemaining = null;
         this.currentPlayerIndex = 0;
         this.hasTreasure = false;
+        this.selectedPiece = null;
+        this.turnHasMoved = false;
     }
 
     init(data) {
@@ -14,7 +16,7 @@ class RoundSystem extends Phaser.Scene {
     }
 
     create() {
-        this.keys = this.input.keyboard.addKeys("W,A,S,D");
+        this.keys = this.input.keyboard.addKeys("W,A,S,D,C,TAB");
         this.createGameBoard();
 
         this.coordDisplay = this.add.text(0, 0, "", {
@@ -87,12 +89,18 @@ class RoundSystem extends Phaser.Scene {
             this.players[i] = new Player(this, start.col, start.row, colors[i], i + 1);
         }
 
+        this.selectedPiece = this.players[this.currentPlayerIndex];
+
         this.rounds = this.players.length - 1;
 
         this.RollButton = this.makeButton(835, 550, "Roll", () => {
             const rollNumber = Phaser.Math.Between(1, 6);
             this.movesRemaining = rollNumber;
             this.rollNumber.setText(`Moves: ${rollNumber}`);
+        });
+
+        this.makeButton(835, 600, "Clone (C)", () => {
+            this.createClone();
         });
     }
 
@@ -105,6 +113,19 @@ class RoundSystem extends Phaser.Scene {
             this.movePlayer(0, 1);
         } else if (Phaser.Input.Keyboard.JustDown(this.keys.D)) {
             this.movePlayer(1, 0);
+        }
+
+        const player = this.players[this.currentPlayerIndex];
+
+        if (Phaser.Input.Keyboard.JustDown(this.keys.C)) {
+            this.createClone();
+        }
+
+        if (Phaser.Input.Keyboard.JustDown(this.keys.TAB)) {
+                this.selectedPiece =
+                    this.selectedPiece === player
+                        ? player.clonePiece
+                        : player;
         }
     }
 
@@ -166,7 +187,7 @@ class RoundSystem extends Phaser.Scene {
     movePlayer(x, y) {
         if (this.movesRemaining <= 0) return;
 
-        const player = this.players[this.currentPlayerIndex]
+        const player = this.selectedPiece || this.players[this.currentPlayerIndex]
 
         const newCol = player.col + x;
         const newRow = player.row + y;
@@ -212,14 +233,49 @@ class RoundSystem extends Phaser.Scene {
             this.nextTurn();
     }
 
+
     nextTurn() {
+        const player = this.players[this.currentPlayerIndex];
+
+        // Update clone lifespan
+        if (player.clonePiece) {
+            const clone = player.clonePiece;
+
+            if (clone.cloneJustCreated) {
+                clone.cloneJustCreated = false;
+            } else {
+                clone.cloneTurnsRemaining--;
+
+                if (clone.cloneTurnsRemaining <= 0) {
+                    clone.destroy();
+                    player.clonePiece = null;
+
+                    console.log(`Player ${player.id}'s clone expired.`);
+                    
+                    // Reset clone status for player
+                    player.hasCloned = false;
+                }
+            }
+        }
+
         this.currentPlayerIndex++;
 
         if (this.currentPlayerIndex >= this.players.length) {
             this.currentPlayerIndex = 0;
             this.StatuesMove();
         }
+
+        this.movesRemaining = null;
+        this.turnHasMoved = false;
+
+        // OG piece selected
+        this.selectedPiece = this.players[this.currentPlayerIndex];
+
+        this.rollNumber.setText(
+            `Player ${this.currentPlayerIndex + 1}: Roll to move`
+        );
     }
+
 
     StatuesMove() {
         console.log("Statues moving");
@@ -251,6 +307,86 @@ class RoundSystem extends Phaser.Scene {
         })
 
         return btn
+    }
+
+    createClone() {
+        const player = this.players[this.currentPlayerIndex];
+
+        if (player.hasCloned) {
+            console.log("You have already created your clone");
+            return;
+        }
+
+        if (this.turnHasMoved) {
+            console.log("You cannot clone after moving");
+            return;
+        }
+
+        const gridSize = this.registry.get("gridSize");
+
+        const directions = [
+            { col: 0, row: -1 },
+            { col: 1, row: 0 },
+            { col: 0, row: 1 },
+            { col: -1, row: 0 }
+        ];
+
+        // Randomize tile spawn
+        Phaser.Utils.Array.Shuffle(directions);
+
+        let spawnCol = null;
+        let spawnRow = null;
+
+        for (const direction of directions) {
+            const col = player.col + direction.col;
+            const row = player.row + direction.row;
+
+            // Avoid outside spawning
+            if (
+                col < 0 || col >= gridSize ||
+                row < 0 || row >= gridSize
+            ) {
+                continue;
+            }
+
+            const occupied = this.players.some(other => {
+                if (other.col === col && other.row === row) {
+                    return true;
+                }
+
+                const clone = other.clonePiece;
+
+                return clone &&
+                    clone.active &&
+                    clone.col === col &&
+                    clone.row === row;
+            });
+
+            if (occupied) {
+                continue;
+            }
+
+            spawnCol = col;
+            spawnRow = row;
+            break;
+        }
+
+        // Make clone
+        const clone = new Player(
+            this,
+            spawnCol,
+            spawnRow,
+            player.playerColor,
+            player.id,
+            true
+        );
+
+        player.clonePiece = clone;
+        player.hasCloned = true;
+        clone.cloneJustCreated = true;
+
+        // Cloning ends the player's turn.
+        this.nextTurn();
     }
 
     
