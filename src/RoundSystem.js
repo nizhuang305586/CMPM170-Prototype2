@@ -4,6 +4,8 @@ class RoundSystem extends Phaser.Scene {
 
         this.players = [];
         this.rounds = null;
+        this.movesRemaining = null;
+        this.currentPlayerIndex = 0;
     }
 
     init(data) {
@@ -11,6 +13,7 @@ class RoundSystem extends Phaser.Scene {
     }
 
     create() {
+        this.keys = this.input.keyboard.addKeys("W,A,S,D");
         this.createGameBoard();
 
         this.coordDisplay = this.add.text(0, 0, "", {
@@ -57,14 +60,23 @@ class RoundSystem extends Phaser.Scene {
 
         this.rounds = this.players.length - 1;
 
-        this.RollButton = this.makeButton(805, 550, "Roll", () => {
+        this.RollButton = this.makeButton(835, 550, "Roll", () => {
             const rollNumber = Phaser.Math.Between(1, 6);
-            this.rollNumber.setText(rollNumber)
+            this.movesRemaining = rollNumber;
+            this.rollNumber.setText(`Moves: ${rollNumber}`);
         });
     }
 
     update() {
-
+        if (Phaser.Input.Keyboard.JustDown(this.keys.W)) {
+            this.movePlayer(0, -1);
+        } else if (Phaser.Input.Keyboard.JustDown(this.keys.A)) {
+            this.movePlayer(-1, 0);
+        } else if (Phaser.Input.Keyboard.JustDown(this.keys.S)) {
+            this.movePlayer(0, 1);
+        } else if (Phaser.Input.Keyboard.JustDown(this.keys.D)) {
+            this.movePlayer(1, 0);
+        }
     }
 
 
@@ -109,6 +121,49 @@ class RoundSystem extends Phaser.Scene {
                 color: "#ffffff"
             }
         );
+    }
+
+    movePlayer(x, y) {
+        if (this.movesRemaining <= 0) return;
+
+        const player = this.players[this.currentPlayerIndex]
+
+        const newCol = player.col + x;
+        const newRow = player.row + y;
+
+        const tileSize = this.registry.get("tileSize");
+        const offsetX = this.registry.get("offsetX");
+        const offsetY = this.registry.get("offsetY");
+        const gridSize = this.registry.get("gridSize");
+        
+        if (newCol < 0 || newCol >= gridSize || newRow < 0 || newRow >= gridSize) return;
+
+        player.col = newCol;
+        player.row = newRow;
+
+        player.setPosition(
+            offsetX + newCol * tileSize + tileSize / 2,
+            offsetY + newRow * tileSize + tileSize / 2
+        );
+
+        this.movesRemaining--;
+        this.rollNumber.setText(`Moves: ${this.movesRemaining}`);
+
+        if (this.movesRemaining === 0)
+            this.nextTurn();
+    }
+
+    nextTurn() {
+        this.currentPlayerIndex++;
+
+        if (this.currentPlayerIndex >= this.players.length) {
+            this.currentPlayerIndex = 0;
+            this.StatuesMove();
+        }
+    }
+
+    StatuesMove() {
+        console.log("Statues moving");
     }
 
     makeButton(x, y, label, onClick) {
