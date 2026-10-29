@@ -223,6 +223,8 @@ class RoundSystem extends Phaser.Scene {
         if(player.col == this.treasure.col && player.row === this.treasure.row){
             player.hasTreasure = true;
             this.treasure.icon.setVisible(false);
+            this.treasure.col = null;
+            this.treasure.row = null;
             this.treasureHolder.setText(
                 `Treasure: Player ${this.currentPlayerIndex + 1}`
             );
