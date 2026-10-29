@@ -11,6 +11,11 @@ class Load extends Phaser.Scene {
         const offsetX = (960 - boardSize) / 2;
         const offsetY = (640 - boardSize) / 2;
 
+        this.registry.set("gridSize", gridSize);
+        this.registry.set("tileSize", tileSize);
+        this.registry.set("offsetX", offsetX);
+        this.registry.set("offsetY", offsetY);
+
         const graphics = this.add.graphics();
 
         // Draw the 16 x 16 board.

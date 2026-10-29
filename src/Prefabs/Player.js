@@ -4,6 +4,11 @@ class Player extends Phaser.Scene {
     }
 
     create() {
+        this.gridSize = this.registry.get("gridSize");
+        this.tileSize = this.registry.get("tileSize");
+        this.offsetX = this.registry.get("offsetX");
+        this.offsetY = this.registry.get("offsetY");
+
         this.currentPlayerIndex = 0;
         this.createPlayers();
     }
@@ -12,23 +17,23 @@ class Player extends Phaser.Scene {
         this.players = [
             {
                 id: 1,
-                name: "player 1"
-                col: 0
-                row: 0
+                name: "player 1",
+                col: 0,
+                row: 0,
                 color: 0x3399ff,
                 sprite: null
             },
             {
                 id: 2,
-                name: "player 2"
-                col: 0
-                row: 0
+                name: "player 2",
+                col: 0,
+                row: 0,
                 color: 0xff6666,
                 sprite: null
             }
         ];
 
-        for (constant player of this.players) {
+        for (const player of this.players) {
             player.sprite = this.add.circle(
                 this.tileCenterX(player.col),
                 this.tileCenterY(player.row),
