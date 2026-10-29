@@ -11,6 +11,7 @@ class Player extends Phaser.Scene {
 
         this.currentPlayerIndex = 0;
         this.createPlayers();
+        this.setupInput();
     }
 
     createPlayers() {
@@ -43,6 +44,37 @@ class Player extends Phaser.Scene {
         }
     }
 
+    setupInput() {
+        const tapArea = this.add.zone(
+            this.offsetX,
+            this.offsetY,
+            this.boardSize,
+            this.boardSize
+        );
+
+        tapArea.setOrigin(0, 0);
+        tapArea.setInteractive();
+
+        tapArea.on("pointerdown", (pointer) => {
+            const col = Math.floor(
+                (pointer.x - this.offsetX) / this.tileSize
+            );
+
+            const row = Math.floor(
+                (pointer.y - this.offsetY) / this.tileSize
+            );
+
+            if (
+                col < 0 || col >= this.gridSize ||
+                row < 0 || row >= this.gridSize
+            ) {
+                return;
+            }
+
+            this.moveCurrentPlayer(col, row);
+        });
+    }
+
     moveCurrentPlayer(col, row) {
         const player = this.players[this.currentPlayerIndex];
 
@@ -53,5 +85,26 @@ class Player extends Phaser.Scene {
         if (distance !== 1) {
             return;
         }
+
+        player.col = col;
+        player.row = row;
+
+        player.sprite.setPosition(
+            this.tileCenterX(col),
+            this.tileCenterY(row)
+        );
     }
+
+    tileCenterX(col) {
+        return this.offsetX +
+            col * this.tileSize +
+            this.tileSize / 2;
+    }
+
+    tileCenterY(row) {
+        return this.offsetY +
+            row * this.tileSize +
+            this.tileSize / 2;
+    }
+
 }
