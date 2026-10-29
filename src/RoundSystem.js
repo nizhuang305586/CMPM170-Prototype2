@@ -55,6 +55,17 @@ class RoundSystem extends Phaser.Scene {
             padding: { x: 8, y: 8 }
         })
 
+        this.selectedPieceDiff = this.add.text(
+            775, 200,
+            "Controlling: Player 1 (Original)",
+            {
+                fontSize: "14px",
+                color: "#ffffff",
+                backgroundColor: "#050505",
+                padding: { x: 8, y: 6 }
+            }
+        );
+
         this.input.on("pointermove", (pointer) => {
             const tileSize = this.registry.get("tileSize");
             const offsetX = this.registry.get("offsetX");
@@ -99,7 +110,7 @@ class RoundSystem extends Phaser.Scene {
             this.rollNumber.setText(`Moves: ${rollNumber}`);
         });
 
-        this.makeButton(835, 600, "Clone (C)", () => {
+        this.makeButton(835, 100, "Clone (C)", () => {
             this.createClone();
         });
     }
@@ -126,6 +137,13 @@ class RoundSystem extends Phaser.Scene {
                     this.selectedPiece === player
                         ? player.clonePiece
                         : player;
+            const pieceType = this.selectedPiece.isClone
+                ? "Clone"
+                : "Original";
+
+            this.selectedPieceDiff.setText(
+                `Controlling: Player ${player.id} (${pieceType})`
+            );
         }
     }
 
