@@ -27,7 +27,7 @@ class RoundSystem extends Phaser.Scene {
             padding: { x: 8, y: 5 }
         })
 
-        this.treasureHolder = this.add.text(775, 300, "Treasure: Nobody", 
+        this.treasureHolder = this.add.text(775, 450, "Treasure: Nobody", 
             {
                 fontSize: "16px",
                 color: "#ffffff",
@@ -35,21 +35,7 @@ class RoundSystem extends Phaser.Scene {
                 padding: { x: 8, y: 8 }
             });
 
-        this.coinResult = this.add.text(795, 400, "", {
-            fontSize: "14px",
-            color: "#050505",
-            backgroundColor: "#fdfdfd",
-            padding: { x: 8, y: 8 }
-        })
-
-        this.makeButton(840, 450, "Flip Coin", () =>{
-            const result = Phaser.Math.Between(0, 1) === 0
-                ? "Heads"
-                : "Tails";
-            this.coinResult.setText(result);
-        });
-
-        this.rollNumber = this.add.text(795, 500, "", {
+        this.rollNumber = this.add.text(776, 300, `Player ${this.currentPlayerIndex + 1}: Roll to move`, {
             fontSize: "14px",
             color: "#050505",
             backgroundColor: "#fdfdfd",
@@ -57,21 +43,21 @@ class RoundSystem extends Phaser.Scene {
         })
 
         this.selectedPieceDiff = this.add.text(
-            775, 350,
+            775, 400,
             "Controlling: Player 1 (Original)",
             {
-                fontSize: "14px",
+                fontSize: "19px",
                 color: "#ffffff",
-                backgroundColor: "#050505",
+                backgroundColor: "#ff0000",
                 padding: { x: 8, y: 6 }
             }
         );
 
         this.ruleText = this.add.text(
-            775, 100,
-            "Rules:\n- Roll to move\n- Clone will end turn\n- TAB to switch between clones and OG\n- Avoid statues line of sight\nGoals:\n- Steal the treasure\n- Defend the treasure if you have it\n- Return to your starting position\nwith the treasure to win",
+            775, 40,
+            "PLAYER 1 = BLUE\nPLAYER 2 = RED\n\nRULES:\n- Move with WASD\n- 'C' to clone\n- TAB to switch between clone and OG\nGoals:\n- Steal the treasure\n- Return to your starting position\n  with the treasure to win",
             {
-                fontSize: "14px",
+                fontSize: "19px",
                 color: "#ffffff",
                 backgroundColor: "#ff0000",
                 padding: { x: 8, y: 6 }
@@ -118,14 +104,10 @@ class RoundSystem extends Phaser.Scene {
 
         this.rounds = this.players.length - 1;
 
-        this.RollButton = this.makeButton(835, 550, "Roll", () => {
+        this.RollButton = this.makeButton(853, 350, "Roll (CLICK)", () => {
             const rollNumber = Phaser.Math.Between(1, 6);
             this.movesRemaining = rollNumber;
             this.rollNumber.setText(`Moves: ${rollNumber}`);
-        });
-
-        this.makeButton(100, 100, "Clone (C)", () => {
-            this.createClone();
         });
     }
 
