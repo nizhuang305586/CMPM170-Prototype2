@@ -446,7 +446,7 @@ class RoundSystem extends Phaser.Scene {
                 direction: position.direction,
                 range: 5,
                 fovGraphics: this.add.graphics(),
-                icon: this.add.text(0, 0, "😭", {
+                icon: this.add.text(0, 0, "🗿", {
                     fontSize: "26px",
                 }).setOrigin(0.5).setDepth(4)
             };
