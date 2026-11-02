@@ -247,6 +247,10 @@ class RoundSystem extends Phaser.Scene {
 
         if (this.movesRemaining === 0)
             this.nextTurn();
+
+        if (this.checkStatueFOV(player)) {
+            return;
+        }
     }
 
 
@@ -303,6 +307,11 @@ class RoundSystem extends Phaser.Scene {
             this.drawStatueFOV(statue);
         }
 
+        for (const player of this.players) {
+            if (player.active) {
+                this.checkStatueFOV(player);
+            }
+        }
     }
 
     makeButton(x, y, label, onClick) {
@@ -483,6 +492,35 @@ class RoundSystem extends Phaser.Scene {
             offsetX + statue.col * tileSize + tileSize / 2,
             offsetY + statue.row * tileSize + tileSize / 2
         );
+    }
+
+    // DEATH LOGIC
+    checkStatueFOV(player) {
+        for (const statue of this.statues) {
+
+            const directions = [
+                { col: 0, row: -1 }, // Up
+                { col: 1, row: 0 },  // Right
+                { col: 0, row: 1 },  // Down
+                { col: -1, row: 0 }  // Left
+            ];
+
+            const direction = directions[statue.direction];
+
+            for (let distance = 1; distance <= statue.range; distance++) {
+
+                const fovCol = statue.col + direction.col * distance;
+                const fovRow = statue.row + direction.row * distance;
+
+                if (player.col === fovCol && player.row === fovRow) {
+                    console.log(`Player ${player.id} was caught!`);
+                    player.destroy();
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
 }
