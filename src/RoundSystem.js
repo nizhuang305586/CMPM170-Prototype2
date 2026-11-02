@@ -416,9 +416,10 @@ class RoundSystem extends Phaser.Scene {
 
     createStatues() {
         const positions = [
-            { col: 4, row: 4, direction: 1 },
-            { col: 11, row: 3, direction: 2 },
-            { col: 10, row: 11, direction: 3 }
+            { col: 4, row: 9, direction: 1 },
+            { col: 12, row: 7, direction: 3 },
+            { col: 9, row: 3, direction: 2 },
+            { col: 7, row: 12, direction: 0 }
         ];
 
         for (const position of positions) {
