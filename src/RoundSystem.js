@@ -31,7 +31,7 @@ class RoundSystem extends Phaser.Scene {
             {
                 fontSize: "16px",
                 color: "#ffffff",
-                backgroundColor: "#222222",
+                backgroundColor: "#040404",
                 padding: { x: 8, y: 8 }
             });
 
@@ -57,7 +57,7 @@ class RoundSystem extends Phaser.Scene {
         })
 
         this.selectedPieceDiff = this.add.text(
-            775, 200,
+            775, 350,
             "Controlling: Player 1 (Original)",
             {
                 fontSize: "14px",
@@ -66,6 +66,17 @@ class RoundSystem extends Phaser.Scene {
                 padding: { x: 8, y: 6 }
             }
         );
+
+        this.ruleText = this.add.text(
+            775, 100,
+            "Rules:\n- Roll to move\n- Clone will end turn\n- TAB to switch between clones and OG\n- Avoid statues line of sight\nGoals:\n- Steal the treasure\n- Defend the treasure if you have it\n- Return to your starting position\nwith the treasure to win",
+            {
+                fontSize: "14px",
+                color: "#ffffff",
+                backgroundColor: "#ff0000",
+                padding: { x: 8, y: 6 }
+            }
+        )
 
         this.input.on("pointermove", (pointer) => {
             const tileSize = this.registry.get("tileSize");
@@ -113,7 +124,7 @@ class RoundSystem extends Phaser.Scene {
             this.rollNumber.setText(`Moves: ${rollNumber}`);
         });
 
-        this.makeButton(835, 100, "Clone (C)", () => {
+        this.makeButton(100, 100, "Clone (C)", () => {
             this.createClone();
         });
     }
@@ -188,8 +199,8 @@ class RoundSystem extends Phaser.Scene {
             col: 8, 
             row: 8,
             icon: this.add.text(
-                offsetX + boardSize / 2 + 1.5,
-                offsetY + boardSize / 2 + 5,
+                offsetX + boardSize / 2 - 3,
+                offsetY + boardSize / 2 + 3,
                 "💎",
                 { fontSize: "32px" }
             )
