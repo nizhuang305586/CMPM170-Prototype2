@@ -57,7 +57,7 @@ class RoundSystem extends Phaser.Scene {
 
         this.ruleText = this.add.text(
             775, 40,
-            "PLAYER 1 = BLUE\nPLAYER 2 = RED\n\nRULES:\n- Move with WASD\n- 'C' to clone\n- 'E' to clone last turn\n- TAB to switch between clone and OG\nGoals:\n- Steal the treasure\n- Return to your starting position\n  with the treasure to win",
+            "PLAYER 1 = BLUE\nPLAYER 2 = RED\n\nRULES:\n- Move with WASD\n- 'C' to clone\n- 'E' to clone last movement turn\n- TAB to switch between clone and OG\nGoals:\n- Steal the treasure\n- Return to your starting position\n  with the treasure to win",
             {
                 fontSize: "19px",
                 color: "#ffffff",
