@@ -134,7 +134,7 @@ class RoundSystem extends Phaser.Scene {
             this.cloneLastTurn();
         }
 
-        if (Phaser.Input.Keyboard.JustDown(this.keys.TAB)) {
+        if (Phaser.Input.Keyboard.JustDown(this.keys.TAB) && player.hasCloned) {
                 this.selectedPiece =
                     this.selectedPiece === player
                         ? player.clonePiece
