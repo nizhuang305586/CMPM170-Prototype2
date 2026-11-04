@@ -10,6 +10,8 @@ class RoundSystem extends Phaser.Scene {
         this.selectedPiece = null;
         this.turnHasMoved = false;
         this.statues = [];
+        this.currentMoves = [];
+        this.usingPastMovement = false;
     }
 
     init(data) {
@@ -17,7 +19,7 @@ class RoundSystem extends Phaser.Scene {
     }
 
     create() {
-        this.keys = this.input.keyboard.addKeys("W,A,S,D,C,TAB");
+        this.keys = this.input.keyboard.addKeys("W,A,S,D,C,TAB,E");
         this.createGameBoard();
 
         this.coordDisplay = this.add.text(0, 0, "", {
@@ -55,7 +57,7 @@ class RoundSystem extends Phaser.Scene {
 
         this.ruleText = this.add.text(
             775, 40,
-            "PLAYER 1 = BLUE\nPLAYER 2 = RED\n\nRULES:\n- Move with WASD\n- 'C' to clone\n- TAB to switch between clone and OG\nGoals:\n- Steal the treasure\n- Return to your starting position\n  with the treasure to win",
+            "PLAYER 1 = BLUE\nPLAYER 2 = RED\n\nRULES:\n- Move with WASD\n- 'C' to clone\n- 'E' to clone last turn\n- TAB to switch between clone and OG\nGoals:\n- Steal the treasure\n- Return to your starting position\n  with the treasure to win",
             {
                 fontSize: "19px",
                 color: "#ffffff",
@@ -83,7 +85,7 @@ class RoundSystem extends Phaser.Scene {
             } else {
                 this.coordDisplay.setText("Outside Grid");
             }
-        })
+        });
 
 
         const colors = [0x3399ff, 0xff6666]
@@ -95,7 +97,7 @@ class RoundSystem extends Phaser.Scene {
 
         for (let i = 0; i < this.playerCount; i++) {
             const start = startingPositions[i];
-            this.players[i] = new Player(this, start.col, start.row, colors[i], i + 1);
+            this.players[i] = new Player(this, start.col, start.row, colors[i], i + 1, []);
         }
 
         this.selectedPiece = this.players[this.currentPlayerIndex];
@@ -128,6 +130,10 @@ class RoundSystem extends Phaser.Scene {
             this.createClone();
         }
 
+        if (Phaser.Input.Keyboard.JustDown(this.keys.E)) {
+            this.cloneLastTurn();
+        }
+
         if (Phaser.Input.Keyboard.JustDown(this.keys.TAB)) {
                 this.selectedPiece =
                     this.selectedPiece === player
@@ -138,7 +144,7 @@ class RoundSystem extends Phaser.Scene {
                 : "Original";
 
             this.selectedPieceDiff.setText(
-                `Controlling: Player ${player.id} (${pieceType})`
+                `Controlling: Player ${this.currentPlayerIndex + 1} (${pieceType})`
             );
         }
     }
@@ -199,7 +205,7 @@ class RoundSystem extends Phaser.Scene {
     }
 
     movePlayer(x, y) {
-        if (this.movesRemaining <= 0) return;
+        if (!this.usingPastMovement && this.movesRemaining <= 0) return;
 
         const player = this.selectedPiece || this.players[this.currentPlayerIndex]
 
@@ -215,6 +221,13 @@ class RoundSystem extends Phaser.Scene {
 
         player.col = newCol;
         player.row = newRow;
+
+        if (!this.usingPastMovement) {
+            if (x === 0 && y === -1) this.currentMoves.push("W");
+            else if (x === -1 && y === 0) this.currentMoves.push("A");
+            else if (x === 0 && y === 1) this.currentMoves.push("S");
+            else if (x === 1 && y === 0) this.currentMoves.push("D");
+        }
 
         if(player.col == this.treasure.col && player.row === this.treasure.row){
             player.hasTreasure = true;
@@ -242,41 +255,28 @@ class RoundSystem extends Phaser.Scene {
             }
         }    
 
-        this.movesRemaining--;
-        this.rollNumber.setText(`Moves: ${this.movesRemaining}`);
+        if (!this.usingPastMovement) {
+            this.movesRemaining--;
+            this.rollNumber.setText(`Moves: ${this.movesRemaining}`);
 
-        if (this.movesRemaining === 0)
-            this.nextTurn();
+            if (this.movesRemaining === 0)
+                this.nextTurn();
 
-        if (this.checkStatueFOV(player)) {
-            return;
-        }
+            if (player.clonePiece) {
+                this.checkStatueFOV(player.clonePiece);
+            };
+        };
+
+        this.checkStatueFOV(player);
+
     }
 
 
     nextTurn() {
         const player = this.players[this.currentPlayerIndex];
 
-        // Update clone lifespan
-        if (player.clonePiece) {
-            const clone = player.clonePiece;
-
-            if (clone.cloneJustCreated) {
-                clone.cloneJustCreated = false;
-            } else {
-                clone.cloneTurnsRemaining--;
-
-                if (clone.cloneTurnsRemaining <= 0) {
-                    clone.destroy();
-                    player.clonePiece = null;
-
-                    console.log(`Player ${player.id}'s clone expired.`);
-                    
-                    // Reset clone status for player
-                    player.hasCloned = false;
-                }
-            }
-        }
+        player.previousMoves = [...this.currentMoves];
+        this.currentMoves = [];
 
         this.currentPlayerIndex++;
 
@@ -293,6 +293,9 @@ class RoundSystem extends Phaser.Scene {
 
         this.rollNumber.setText(
             `Player ${this.currentPlayerIndex + 1}: Roll to move`
+        );
+        this.selectedPieceDiff.setText(
+            `Controlling: Player ${this.currentPlayerIndex + 1}`
         );
     }
 
@@ -493,6 +496,33 @@ class RoundSystem extends Phaser.Scene {
             offsetY + statue.row * tileSize + tileSize / 2
         );
     }
+
+    async cloneLastTurn() {
+        const player = this.players[this.currentPlayerIndex];
+
+        if (player.previousMoves.length === 0) return;
+
+        this.usingPastMovement = true;
+
+        for (let i = 0; i < player.previousMoves.length; i++) {
+            if (player.previousMoves[i] == "W") {
+                this.movePlayer(0, -1);
+            } else if (player.previousMoves[i] == "A") {
+                this.movePlayer(-1, 0);
+            } else if (player.previousMoves[i] == "S") {
+                this.movePlayer(0, 1);
+            } else if (player.previousMoves[i] == "D") {
+                this.movePlayer(1, 0);
+            };
+
+            await new Promise(resolve => {
+                this.time.delayedCall(300, resolve);
+            });
+        }
+
+        this.usingPastMovement = false;
+        this.nextTurn()
+    };
 
     // DEATH LOGIC
     checkStatueFOV(player) {

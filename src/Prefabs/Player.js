@@ -1,5 +1,5 @@
 class Player extends Phaser.GameObjects.Arc {
-    constructor(scene, col, row, color, id, isClone = false) {
+    constructor(scene, col, row, color, id, isClone = false, previousMoves) {
         const tileSize = scene.registry.get("tileSize");
         const offsetX = scene.registry.get("offsetX");
         const offsetY = scene.registry.get("offsetY");
@@ -30,6 +30,8 @@ class Player extends Phaser.GameObjects.Arc {
         this.cloneJustCreated = false;
 
         this.hasTreasure = false;
+
+        this.previousMoves = previousMoves;
 
     }
 
